@@ -1,0 +1,184 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = "mysql://root:@localhost:3306/easybilling"
+}
+model Utilisateur {
+  id Int @id @default(autoincrement())
+  nom String
+  prenom String
+  username String
+  password String
+  nom_signateur_facture String?
+  activer Boolean @default(true)
+  createAt DateTime @default(now())
+  updateAt DateTime @updatedAt()
+}
+model Categorie {
+  id Int @id @default(autoincrement())
+  libelle String
+  produits Produit[]
+  activer Boolean @default(true)
+  createAt DateTime @default(now())
+  updateAt DateTime @updatedAt()
+}
+model UniteMesure {
+  id Int @id @default(autoincrement())
+  libelle String
+  produits Produit[]
+  activer Boolean @default(true)
+  createAt DateTime @default(now())
+  updateAt DateTime @updatedAt
+}
+model Produit {
+  id Int @id @default(autoincrement())
+  nom String
+  stock_actuel Int @default(0)
+  type_produit TypeProduit
+  prix_unitaire_revien Decimal @default(0)
+  prix_unitaire_vente Decimal @default(0)
+  categorieId Int
+  uniteId Int?
+  categorie Categorie @relation(fields: [categorieId],references: [id])
+  unite_mesure UniteMesure? @relation(fields: [uniteId],references: [id])
+  details_facture DetailFacture[]
+  mouvements_stock MouvementStock[]
+  activer Boolean @default(true)
+  createAt DateTime @default(now())
+  updateAt DateTime @updatedAt()
+}
+model Client {
+  id Int @id @default(autoincrement())
+  nom String
+  NIF String?
+  type_personne TypePersonne
+  assujetti_tva Boolean @default(false)
+  assujetti_tc Boolean @default(false)
+  assujetti_pf Boolean @default(false)
+  client_local Boolean @default(true)
+  client_telephone String?
+  client_mail String?
+  client_boite_postal String?
+  secteur_activite String?
+  adresse_province String?
+  adresse_commune String?
+  adresse_quartier String?
+  adresse_avenue String?
+  nom_representant String?
+  telephone_representant String?
+  mail_representant String?
+  factures Facture[]
+  activer Boolean @default(true)
+  createAt DateTime @default(now())
+  updateAt DateTime @updatedAt()
+}
+model Devise {
+  id Int @id @default(autoincrement())
+  libelle String
+  taux_change Int @default(1)
+  langue Langue
+  factures Facture[]
+  activer Boolean @default(true)
+  createAt DateTime @default(now())
+  updateAt DateTime @updatedAt() 
+}
+model Banque {
+  id Int @id @default(autoincrement())
+  nom_bank String
+  numero_compte String
+  factures Facture[]
+  activer Boolean @default(true)
+  createAt DateTime @default(now())
+  updateAt DateTime @updatedAt()
+}
+
+model Facture {
+  id Int @id @default(autoincrement())
+  devise_id Int
+  devise Devise @relation(fields: [devise_id], references: [id])
+  taux_change Int @default(1)
+  client_id Int 
+  client Client @relation(fields: [client_id],references: [id])
+  numeroFacture Int?
+  mode_paiement_id Int
+  ModePaiement ModePaiement @default(espece)
+  banque_id Int?
+  banque Banque? @relation(fields: [banque_id], references: [id])
+  date_paiement DateTime?
+  type_facture TypeFacture @default(facture_normale)
+  facture_ref_id Int?
+  facture_normal Facture? @relation("factureModifier",fields: [facture_ref_id],references: [id])
+  factures_modifier Facture[] @relation("factureModifier")
+  facture_motif String?
+  facture_signature_electronique String?
+  nom_prenom_signateur String?
+  date_validation_obr DateTime?
+  etat_fini Boolean @default(false)
+  status_obr Boolean @default(false)
+  activer Boolean @default(true)
+  createAt DateTime @default(now())
+  updateAt DateTime @updatedAt()
+}
+model DetailFacture {
+  id Int @id @default(autoincrement())
+  produit_id Int
+  produit Produit @relation(fields: [produit_id], references: [id])
+  prix_unitaire_vente Decimal
+  createAt DateTime @default(now())
+  updateAt DateTime @updatedAt()
+}
+model MouvementStock {
+  id Int @id @default(autoincrement())
+  mouv_id_system String
+  type_mouvement TypeMouvementStock
+  produit_id Int
+  produit Produit @relation(fields: [produit_id],references: [id]) 
+  quantite Int
+  unite_mesure String
+  prix_vente_htva Decimal
+  motif String?
+  envoyer_obr Boolean @default(false)
+  activer Boolean @default(true)
+   createAt DateTime @default(now())
+  updateAt DateTime @updatedAt()
+}
+enum TypeMouvementStock {
+  entree
+  sortie
+}
+model LogOBR {
+  id Int @id @default(autoincrement())
+  methode String
+  lien String?
+  code_reponse Int
+  message_reponse String
+  date_envoi DateTime @default(now())
+  updateAt DateTime @updatedAt()
+}
+enum Langue {
+  fr
+  en
+}
+enum TypeFacture {
+  facture_normale
+  facture_avoir
+  rembourcement_credit
+}
+enum ModePaiement {
+  espece
+  bank
+}
+enum TypePersonne {
+  personne_physique
+  personne_morale
+}
+enum TypeProduit {
+  stockable
+  non_stockable
+}
