@@ -1,8 +1,7 @@
-import { prismaClient } from "@/utils/prismaclient";
 import { NextApiRequest, NextApiResponse } from "next";
 //get all categorie of product
 export async function GET() {
-  const categories = await prismaClient.categorie.findMany({
+  const categories = await prisma.categorie.findMany({
     where: { activer: true },
   });
   return Response.json(categories);

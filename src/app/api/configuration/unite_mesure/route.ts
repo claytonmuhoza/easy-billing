@@ -1,8 +1,7 @@
-import { prismaClient } from "@/utils/prismaclient";
 import { NextResponse, NextRequest } from "next/server";
 //getAllUnite_mesure
 export async function GET() {
-  const unites = await prismaClient.uniteMesure.findMany();
+  const unites = await prisma.uniteMesure.findMany();
   return Response.json(unites);
 }
 //create a unite_mesure
