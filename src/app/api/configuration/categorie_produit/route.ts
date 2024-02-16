@@ -1,14 +1,13 @@
 import { prismaClient } from "@/utils/prismaclient";
-import { NextResponse } from "next/server";
+import { NextApiRequest, NextApiResponse } from "next";
 //get all categorie of product
 export async function GET() {
   const categories = await prismaClient.categorie.findMany({
     where: { activer: true },
   });
-  return NextResponse.json(categories);
+  return Response.json(categories);
 }
 //create a new product
-export async function POST(request: Request) {
-  //const reques = await request.json();
-  return NextResponse.json("creer avec succes");
+export async function POST() {
+  return Response.json("en developpement");
 }
