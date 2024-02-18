@@ -9,6 +9,30 @@ datasource db {
   provider = "mysql"
   url      = "mysql://root:@localhost:3306/easybilling"
 }
+model Societe {
+  id Int @id @default(autoincrement())
+  identifiant_system String
+  mot_de_passe_system String
+  nom String
+  nif String
+  rc String?
+  adresse_province String
+  adresse_commune String
+  adresse_quartier String
+  adresse_avenue String?
+  utilisateurs Utilisateur[]
+  categories_produit Categorie[]
+  unites_mesure UniteMesure[]
+  factures Facture[]
+  produits Produit[]
+  clients Client[]
+  devise Devise[]
+  banques Banque[]
+  mouvements_stock MouvementStock[]
+  log_obr LogOBR[]
+  createAt DateTime @default(now())
+  updateAt DateTime @updatedAt()
+}
 model Utilisateur {
   id Int @id @default(autoincrement())
   nom String
@@ -17,6 +41,8 @@ model Utilisateur {
   password String
   nom_signateur_facture String?
   activer Boolean @default(true)
+  societe_id Int
+  societe Societe @relation(fields: [societe_id],references: [id])
   createAt DateTime @default(now())
   updateAt DateTime @updatedAt()
 }
@@ -27,6 +53,8 @@ model Categorie {
   activer Boolean @default(true)
   createAt DateTime @default(now())
   updateAt DateTime @updatedAt()
+  societe_id Int
+  societe Societe @relation(fields: [societe_id],references: [id])
 }
 model UniteMesure {
   id Int @id @default(autoincrement())
@@ -35,6 +63,8 @@ model UniteMesure {
   activer Boolean @default(true)
   createAt DateTime @default(now())
   updateAt DateTime @updatedAt
+  societe_id Int
+  societe Societe @relation(fields: [societe_id],references: [id])
 }
 model Produit {
   id Int @id @default(autoincrement())
@@ -52,6 +82,8 @@ model Produit {
   activer Boolean @default(true)
   createAt DateTime @default(now())
   updateAt DateTime @updatedAt()
+  societe_id Int
+  societe Societe @relation(fields: [societe_id],references: [id])
 }
 model Client {
   id Int @id @default(autoincrement())
@@ -77,6 +109,8 @@ model Client {
   activer Boolean @default(true)
   createAt DateTime @default(now())
   updateAt DateTime @updatedAt()
+  societe_id Int
+  societe Societe @relation(fields: [societe_id],references: [id])
 }
 model Devise {
   id Int @id @default(autoincrement())
@@ -87,6 +121,8 @@ model Devise {
   activer Boolean @default(true)
   createAt DateTime @default(now())
   updateAt DateTime @updatedAt() 
+  societe_id Int
+  societe Societe @relation(fields: [societe_id],references: [id])
 }
 model Banque {
   id Int @id @default(autoincrement())
@@ -96,6 +132,8 @@ model Banque {
   activer Boolean @default(true)
   createAt DateTime @default(now())
   updateAt DateTime @updatedAt()
+  societe_id Int
+  societe Societe @relation(fields: [societe_id],references: [id])
 }
 
 model Facture {
@@ -121,9 +159,13 @@ model Facture {
   date_validation_obr DateTime?
   etat_fini Boolean @default(false)
   status_obr Boolean @default(false)
+  electronique_signature String?
+  details_facture DetailFacture[]
   activer Boolean @default(true)
   createAt DateTime @default(now())
   updateAt DateTime @updatedAt()
+  societe_id Int
+  societe Societe @relation(fields: [societe_id],references: [id])
 }
 model DetailFacture {
   id Int @id @default(autoincrement())
@@ -132,6 +174,8 @@ model DetailFacture {
   prix_unitaire_vente Decimal
   createAt DateTime @default(now())
   updateAt DateTime @updatedAt()
+  facture_id Int
+  facture Facture @relation(fields: [facture_id], references: [id])
 }
 model MouvementStock {
   id Int @id @default(autoincrement())
@@ -147,6 +191,8 @@ model MouvementStock {
   activer Boolean @default(true)
    createAt DateTime @default(now())
   updateAt DateTime @updatedAt()
+  societe_id Int
+  societe Societe @relation(fields: [societe_id],references: [id])
 }
 enum TypeMouvementStock {
   entree
@@ -158,8 +204,11 @@ model LogOBR {
   lien String?
   code_reponse Int
   message_reponse String
+  signature_electronique String?
   date_envoi DateTime @default(now())
   updateAt DateTime @updatedAt()
+  societe_id Int
+  societe Societe @relation(fields: [societe_id],references: [id])
 }
 enum Langue {
   fr
